@@ -17,16 +17,10 @@ func (t *Conn) Connect(driverName, dsn, dbName string) (err error) {
 	t.Dsn = dsn
 	t.DbName = dbName
 
-	t.db, err = sql.Open(t.DriverName, t.Dsn)
-	if err != nil {
+	if t.db, err = sql.Open(t.DriverName, t.Dsn); err != nil {
 		return err
 	}
-
-	err = t.db.Ping()
-	if err != nil {
-		return err
-	}
-	return nil
+	return t.db.Ping()
 }
 
 func (t *Conn) Raw() *sql.DB {
