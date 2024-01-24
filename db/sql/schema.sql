@@ -16,7 +16,6 @@
 
 
 -- cafe 데이터베이스 구조 내보내기
-DROP DATABASE IF EXISTS `cafe`;
 CREATE DATABASE IF NOT EXISTS `cafe` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 USE `cafe`;
 
@@ -39,13 +38,17 @@ DROP TABLE IF EXISTS `product`;
 CREATE TABLE IF NOT EXISTS `product` (
   `seq` bigint(20) NOT NULL AUTO_INCREMENT,
   `category` varchar(50) DEFAULT '',
+  `price` int(11) NOT NULL DEFAULT 0,
   `cost` int(11) NOT NULL DEFAULT 0,
   `name` varchar(50) NOT NULL DEFAULT '',
+  `name_initial` varchar(50) NOT NULL DEFAULT '',
   `description` varchar(200) NOT NULL DEFAULT '',
   `barcode` varbinary(200) NOT NULL DEFAULT '',
   `expire` timestamp NOT NULL,
   `size` tinyint(4) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`seq`)
+  PRIMARY KEY (`seq`),
+  UNIQUE KEY `name` (`name`) USING BTREE,
+  INDEX `name_initial` (`name_initial`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 테이블 데이터 cafe.product:~0 rows (대략적) 내보내기
