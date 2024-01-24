@@ -4,58 +4,64 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"sync/atomic"
+
+	"github.com/gokch/cafe_manager/db/sqlc"
 )
 
-// db or tx
+// non-tx job
 func NewJob(db *sql.DB) *Job {
-	return &Job{db: db}
+	return &Job{
+		Queries: sqlc.New(db),
+		db:      db,
+	}
 }
 
 type Job struct {
-	db *sql.DB
-	tx *sql.Tx
+	Queries *sqlc.Queries
+	db      *sql.DB
 }
 
-func (t *Job) Exec(query string, args ...interface{}) (res sql.Result, err error) {
-	if t.tx == nil {
-		res, err = t.db.Exec(query, args...)
-	} else {
-		res, err = t.tx.Exec(query, args...)
-	}
-	return res, err
-}
-
-func (t *Job) Query(query string, args ...interface{}) (rows *sql.Rows, err error) {
-	if t.tx == nil {
-		rows, err = t.db.Query(query, args...)
-	} else {
-		rows, err = t.tx.Query(query, args...)
-	}
-	return rows, err
-}
-
-func (t *Job) BeginTx(isoLevel sql.IsolationLevel, readonly bool) error {
-	var err error
-	t.tx, err = t.db.BeginTx(context.Background(), &sql.TxOptions{
+// tx job
+func NewTx(db *sql.DB, isoLevel sql.IsolationLevel, readOnly bool) (*Tx, error) {
+	tx, err := db.BeginTx(context.Background(), &sql.TxOptions{
 		Isolation: isoLevel,
-		ReadOnly:  readonly,
+		ReadOnly:  readOnly,
 	})
 	if err != nil {
+		return nil, err
+	}
+	return &Tx{
+		Queries: sqlc.New(tx),
+		tx:      tx,
+	}, nil
+}
+
+type Tx struct {
+	closed  atomic.Bool
+	Queries *sqlc.Queries
+	tx      *sql.Tx
+}
+
+func (t *Tx) Commit() error {
+	if t.closed.Load() {
+		return errors.New("tx already commit or rollback")
+	}
+	if err := t.tx.Commit(); err != nil {
+		t.tx.Rollback()
 		return err
 	}
+	t.closed.Store(true)
 	return nil
 }
 
-func (t *Job) Commit() error {
-	if t.tx == nil {
-		return errors.New("not transaction job")
+func (t *Tx) Rollback() error {
+	if t.closed.Load() {
+		return errors.New("tx already commit or rollback")
 	}
-	return t.tx.Commit()
-}
-
-func (t *Job) Rollback() error {
-	if t.tx == nil {
-		return errors.New("not transaction job")
+	if err := t.tx.Rollback(); err != nil {
+		panic("failed to rollback")
 	}
-	return t.tx.Rollback()
+	t.closed.Store(true)
+	return nil
 }

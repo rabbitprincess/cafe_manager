@@ -10,11 +10,11 @@ import (
 )
 
 type Admin struct {
-	Seq   uint64         `json:"seq"`
-	ID    string         `json:"id"`
-	Name  sql.NullString `json:"name"`
-	Pw    sql.NullString `json:"pw"`
-	Phone sql.NullString `json:"phone"`
+	Seq   uint64 `json:"seq"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Pw    []byte `json:"pw"`
+	Phone string `json:"phone"`
 }
 
 type Product struct {

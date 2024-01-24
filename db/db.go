@@ -4,23 +4,25 @@ import (
 	"database/sql"
 )
 
+func Connect(conn ConnectFunc) (db *Conn, err error) {
+	db = &Conn{}
+	db.DriverName, db.Dsn, db.DbName = conn()
+
+	if db.db, err = sql.Open(db.DriverName, db.Dsn); err != nil {
+		return nil, err
+	}
+	if err = db.db.Ping(); err != nil {
+		return nil, err
+	}
+	return db, err
+}
+
 type Conn struct {
 	DriverName string
 	Dsn        string
 	DbName     string
 
 	db *sql.DB
-}
-
-func (t *Conn) Connect(driverName, dsn, dbName string) (err error) {
-	t.DriverName = driverName
-	t.Dsn = dsn
-	t.DbName = dbName
-
-	if t.db, err = sql.Open(t.DriverName, t.Dsn); err != nil {
-		return err
-	}
-	return t.db.Ping()
 }
 
 func (t *Conn) Raw() *sql.DB {
@@ -41,31 +43,22 @@ func (t *Conn) Job() *Job {
 	return job
 }
 
-func (t *Conn) TxJob(isoLevel sql.IsolationLevel, readonly bool) (job *Job, err error) {
-	job = t.Job()
-	err = job.BeginTx(isoLevel, readonly)
+func (t *Conn) TxJob(isoLevel sql.IsolationLevel, readonly bool) (tx *Tx, err error) {
+	tx, err = NewTx(t.db, isoLevel, readonly)
 	if err != nil {
 		return nil, err
 	}
-	return job, nil
+	return tx, nil
 }
 
-func (t *Conn) TxJobFunc(isoLevel sql.IsolationLevel, readonly bool, fn func(*Job) error) (err error) {
-	job := NewJob(t.db)
-	err = job.BeginTx(isoLevel, readonly)
+func (t *Conn) TxJobFunc(isoLevel sql.IsolationLevel, readonly bool, fn func(*Tx) error) (err error) {
+	tx, err := t.TxJob(isoLevel, readonly)
 	if err != nil {
 		return err
 	}
 
-	err = fn(job)
-	if err != nil {
-		job.Rollback()
-		return err
+	if err = fn(tx); err != nil {
+		return tx.Rollback()
 	}
-	err = job.Commit()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return tx.Commit()
 }

@@ -16,10 +16,10 @@ INSERT INTO admin (id, name, pw, phone) VALUES (?, ?, ?, ?)
 `
 
 type CreateAdminParams struct {
-	ID    string         `json:"id"`
-	Name  sql.NullString `json:"name"`
-	Pw    sql.NullString `json:"pw"`
-	Phone sql.NullString `json:"phone"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Pw    []byte `json:"pw"`
+	Phone string `json:"phone"`
 }
 
 func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) error {
@@ -207,8 +207,8 @@ UPDATE admin SET pw = ? WHERE id = ?
 `
 
 type UpdateAdminPwParams struct {
-	Pw sql.NullString `json:"pw"`
-	ID string         `json:"id"`
+	Pw []byte `json:"pw"`
+	ID string `json:"id"`
 }
 
 func (q *Queries) UpdateAdminPw(ctx context.Context, arg UpdateAdminPwParams) error {
