@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gokch/cafe_manager/api"
@@ -45,12 +46,18 @@ func init() {
 }
 
 func rootRun(cmd *cobra.Command, args []string) {
-	db, err := db.NewDB(db.ConnectFuncMysql(dbAddress, dbPort, dbUserName, dbPassword, dbName))
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect db")
+	var database *db.DB
+	var err error
+	for {
+		database, err = db.NewDB(db.ConnectFuncMysql(dbAddress, dbPort, dbUserName, dbPassword, dbName))
+		if err == nil {
+			break
+		}
+		log.Warn().Err(err).Strs("args", []string{dbAddress, dbPort, dbUserName, dbPassword, dbName}).Msg("Failed to connect db. retry...")
+		time.Sleep(3 * time.Second)
 	}
 	router := gin.Default()
-	api.InitRouter(service.NewService(db), router)
+	api.InitRouter(service.NewService(database), router)
 
 	go func() {
 		err = router.Run(":" + port)
@@ -61,7 +68,7 @@ func rootRun(cmd *cobra.Command, args []string) {
 
 	// Wait main routine to stop
 	interrupt := utilx.HandleKillSig(func() {
-		db.Close()
+		database.Close()
 	})
 	<-interrupt.C
 }
