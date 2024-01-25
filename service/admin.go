@@ -38,13 +38,15 @@ func (a *Admin) Register(id, name, pw, phone string) error {
 
 func (a *Admin) Login(id, pw string) error {
 	adminInfo, err := a.db.Job().GetAdmin(context.Background(), id)
-	if err != nil {
+	if err == sql.ErrNoRows {
+		return fmt.Errorf("invalid id")
+	} else if err != nil {
 		return err
 	}
-	valid, err := utilx.BCheck(pw, adminInfo.Pw)
+	pwValid, err := utilx.BCheck(pw, adminInfo.Pw)
 	if err != nil {
 		return err
-	} else if valid != true {
+	} else if pwValid != true {
 		return fmt.Errorf("invalid password")
 	}
 	return nil

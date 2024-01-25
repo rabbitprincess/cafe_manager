@@ -18,7 +18,7 @@ var (
 
 func GetMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		seq, exist := c.Get("seq")
+		seq, exist := c.Params.Get("seq")
 		if exist != true {
 			middleware.HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
 			return
