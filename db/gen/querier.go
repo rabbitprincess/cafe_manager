@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.25.0
 
-package sqlc
+package gen
 
 import (
 	"context"
@@ -12,7 +12,7 @@ type Querier interface {
 	CreateAdmin(ctx context.Context, arg CreateAdminParams) error
 	CreateProduct(ctx context.Context, arg CreateProductParams) error
 	DeleteProduct(ctx context.Context, seq int64) error
-	GetAdmin(ctx context.Context, arg GetAdminParams) (*Admin, error)
+	GetAdmin(ctx context.Context, id string) (*Admin, error)
 	GetProduct(ctx context.Context, seq int64) (*Product, error)
 	ListProductsByName(ctx context.Context, arg ListProductsByNameParams) ([]*Product, error)
 	ListProductsByNameInitial(ctx context.Context, arg ListProductsByNameInitialParams) ([]*Product, error)

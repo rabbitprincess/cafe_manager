@@ -6,19 +6,19 @@ import (
 	"errors"
 	"sync/atomic"
 
-	"github.com/gokch/cafe_manager/db/sqlc"
+	"github.com/gokch/cafe_manager/db/gen"
 )
 
 // non-tx job
 func NewJob(db *sql.DB) *Job {
 	return &Job{
-		Queries: sqlc.New(db),
+		Queries: gen.New(db),
 		db:      db,
 	}
 }
 
 type Job struct {
-	*sqlc.Queries
+	*gen.Queries
 	db *sql.DB
 }
 
@@ -32,14 +32,14 @@ func NewTx(db *sql.DB, isoLevel sql.IsolationLevel, readOnly bool) (*Tx, error) 
 		return nil, err
 	}
 	return &Tx{
-		Queries: sqlc.New(tx),
+		Queries: gen.New(tx),
 		tx:      tx,
 	}, nil
 }
 
 type Tx struct {
 	closed atomic.Bool
-	*sqlc.Queries
+	*gen.Queries
 	tx *sql.Tx
 }
 

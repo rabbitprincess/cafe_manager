@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.25.0
 
-package sqlc
+package gen
 
 import (
 	"database/sql"

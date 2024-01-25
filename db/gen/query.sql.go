@@ -3,7 +3,7 @@
 //   sqlc v1.25.0
 // source: query.sql
 
-package sqlc
+package gen
 
 import (
 	"context"
@@ -73,16 +73,11 @@ func (q *Queries) DeleteProduct(ctx context.Context, seq int64) error {
 }
 
 const getAdmin = `-- name: GetAdmin :one
-SELECT seq, id, name, pw, phone FROM admin WHERE id = ? LIMIT ?
+SELECT seq, id, name, pw, phone FROM admin WHERE id = ? LIMIT 1
 `
 
-type GetAdminParams struct {
-	ID    string `json:"id"`
-	Limit int32  `json:"limit"`
-}
-
-func (q *Queries) GetAdmin(ctx context.Context, arg GetAdminParams) (*Admin, error) {
-	row := q.queryRow(ctx, q.getAdminStmt, getAdmin, arg.ID, arg.Limit)
+func (q *Queries) GetAdmin(ctx context.Context, id string) (*Admin, error) {
+	row := q.queryRow(ctx, q.getAdminStmt, getAdmin, id)
 	var i Admin
 	err := row.Scan(
 		&i.Seq,

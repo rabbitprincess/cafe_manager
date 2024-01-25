@@ -2,7 +2,7 @@
 INSERT INTO admin (id, name, pw, phone) VALUES (?, ?, ?, ?);
 
 -- name: GetAdmin :one
-SELECT * FROM admin WHERE id = ? LIMIT ?;
+SELECT * FROM admin WHERE id = ? LIMIT 1;
 
 -- name: UpdateAdminPw :exec
 UPDATE admin SET pw = ? WHERE id = ?;

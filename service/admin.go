@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/gokch/cafe_manager/db"
-	"github.com/gokch/cafe_manager/db/sqlc"
+	"github.com/gokch/cafe_manager/db/gen"
 	"github.com/gokch/cafe_manager/utilx"
 )
 
@@ -24,7 +24,7 @@ func (a *Admin) Register(id, name, pw, phone string) error {
 	}
 
 	return a.db.TxJobFunc(sql.LevelDefault, false, func(tx *db.Tx) error {
-		if err = tx.CreateAdmin(context.Background(), sqlc.CreateAdminParams{
+		if err = tx.CreateAdmin(context.Background(), gen.CreateAdminParams{
 			ID:    id,
 			Name:  name,
 			Pw:    pwSecured,
@@ -36,8 +36,18 @@ func (a *Admin) Register(id, name, pw, phone string) error {
 	})
 }
 
-func (a *Admin) Login() {
-
+func (a *Admin) Login(id, pw string) error {
+	adminInfo, err := a.db.Job().GetAdmin(context.Background(), id)
+	if err != nil {
+		return err
+	}
+	valid, err := utilx.BCheck(pw, adminInfo.Pw)
+	if err != nil {
+		return err
+	} else if valid != true {
+		return fmt.Errorf("invalid password")
+	}
+	return nil
 }
 
 func (a *Admin) Logout() {
