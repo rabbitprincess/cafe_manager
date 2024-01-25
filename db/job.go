@@ -36,6 +36,10 @@ func NewTx(db *sql.DB, isoLevel sql.IsolationLevel, readOnly bool) (*Tx, error) 
 	}, nil
 }
 
+var (
+	ErrTxClosed = errors.New("tx already commit or rollback")
+)
+
 type Tx struct {
 	closed bool
 	*gen.Queries
@@ -44,7 +48,7 @@ type Tx struct {
 
 func (t *Tx) Commit() error {
 	if t.closed {
-		return errors.New("tx already commit or rollback")
+		return ErrTxClosed
 	}
 	if err := t.tx.Commit(); err != nil {
 		t.tx.Rollback()
@@ -56,7 +60,7 @@ func (t *Tx) Commit() error {
 
 func (t *Tx) Rollback() error {
 	if t.closed {
-		return errors.New("tx already commit or rollback")
+		return ErrTxClosed
 	}
 	t.tx.Rollback()
 	t.closed = true
