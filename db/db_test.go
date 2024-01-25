@@ -16,7 +16,6 @@ var admin1 = gen.CreateAdminParams{
 	Phone: "010-1234-5678",
 }
 
-// TODO
 func TestAdmin(t *testing.T) {
 	db, err := NewDB(ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
 	if err != nil {
@@ -25,11 +24,11 @@ func TestAdmin(t *testing.T) {
 	defer db.Close()
 
 	// create admin
-	err = db.Job().Queries.CreateAdmin(context.Background(), admin1)
+	err = db.Job().CreateAdmin(context.Background(), admin1)
 	require.NoError(t, err)
 
 	// get exist admin
-	adminInfo, err := db.Job().Queries.GetAdmin(context.Background(), "admin1")
+	adminInfo, err := db.Job().GetAdmin(context.Background(), "admin1")
 	require.NoError(t, err)
 	require.Equal(t, adminInfo.ID, admin1.ID)
 	require.Equal(t, adminInfo.Name, admin1.Name)
@@ -37,7 +36,7 @@ func TestAdmin(t *testing.T) {
 	require.Equal(t, adminInfo.Pw, admin1.Pw)
 
 	// get not exist admin
-	adminInfo, err = db.Job().Queries.GetAdmin(context.Background(), "admin2")
+	adminInfo, err = db.Job().GetAdmin(context.Background(), "admin2")
 	require.Equal(t, err, sql.ErrNoRows)
 }
 
