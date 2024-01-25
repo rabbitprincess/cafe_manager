@@ -13,10 +13,13 @@ INSERT INTO product (category, price, cost, name, name_initial, description, bar
 -- name: GetProduct :one
 SELECT * FROM product WHERE seq = ? LIMIT 1;
 
--- name: ListProductsByName :many
+-- name: ListProducts :many
+SELECT * FROM product WHERE seq >= ? LIMIT 10;
+
+-- name: SearchProductsByName :many
 SELECT * FROM product WHERE name LIKE ? LIMIT ?;
 
--- name: ListProductsByNameInitial :many
+-- name: SearchProductsByNameInitial :many
 SELECT * FROM product WHERE name_initial LIKE ? LIMIT ?;
 
 -- name: UpdateProductIfNotNil :exec

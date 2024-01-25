@@ -14,8 +14,9 @@ type Querier interface {
 	DeleteProduct(ctx context.Context, seq int64) error
 	GetAdmin(ctx context.Context, id string) (*Admin, error)
 	GetProduct(ctx context.Context, seq int64) (*Product, error)
-	ListProductsByName(ctx context.Context, arg ListProductsByNameParams) ([]*Product, error)
-	ListProductsByNameInitial(ctx context.Context, arg ListProductsByNameInitialParams) ([]*Product, error)
+	ListProducts(ctx context.Context, seq int64) ([]*Product, error)
+	SearchProductsByName(ctx context.Context, arg SearchProductsByNameParams) ([]*Product, error)
+	SearchProductsByNameInitial(ctx context.Context, arg SearchProductsByNameInitialParams) ([]*Product, error)
 	UpdateAdminPw(ctx context.Context, arg UpdateAdminPwParams) error
 	UpdateProductIfNotNil(ctx context.Context, arg UpdateProductIfNotNilParams) error
 }

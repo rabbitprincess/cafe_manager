@@ -39,11 +39,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getProductStmt, err = db.PrepareContext(ctx, getProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProduct: %w", err)
 	}
-	if q.listProductsByNameStmt, err = db.PrepareContext(ctx, listProductsByName); err != nil {
-		return nil, fmt.Errorf("error preparing query ListProductsByName: %w", err)
+	if q.listProductsStmt, err = db.PrepareContext(ctx, listProducts); err != nil {
+		return nil, fmt.Errorf("error preparing query ListProducts: %w", err)
 	}
-	if q.listProductsByNameInitialStmt, err = db.PrepareContext(ctx, listProductsByNameInitial); err != nil {
-		return nil, fmt.Errorf("error preparing query ListProductsByNameInitial: %w", err)
+	if q.searchProductsByNameStmt, err = db.PrepareContext(ctx, searchProductsByName); err != nil {
+		return nil, fmt.Errorf("error preparing query SearchProductsByName: %w", err)
+	}
+	if q.searchProductsByNameInitialStmt, err = db.PrepareContext(ctx, searchProductsByNameInitial); err != nil {
+		return nil, fmt.Errorf("error preparing query SearchProductsByNameInitial: %w", err)
 	}
 	if q.updateAdminPwStmt, err = db.PrepareContext(ctx, updateAdminPw); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateAdminPw: %w", err)
@@ -81,14 +84,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getProductStmt: %w", cerr)
 		}
 	}
-	if q.listProductsByNameStmt != nil {
-		if cerr := q.listProductsByNameStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listProductsByNameStmt: %w", cerr)
+	if q.listProductsStmt != nil {
+		if cerr := q.listProductsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listProductsStmt: %w", cerr)
 		}
 	}
-	if q.listProductsByNameInitialStmt != nil {
-		if cerr := q.listProductsByNameInitialStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listProductsByNameInitialStmt: %w", cerr)
+	if q.searchProductsByNameStmt != nil {
+		if cerr := q.searchProductsByNameStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing searchProductsByNameStmt: %w", cerr)
+		}
+	}
+	if q.searchProductsByNameInitialStmt != nil {
+		if cerr := q.searchProductsByNameInitialStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing searchProductsByNameInitialStmt: %w", cerr)
 		}
 	}
 	if q.updateAdminPwStmt != nil {
@@ -138,31 +146,33 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                            DBTX
-	tx                            *sql.Tx
-	createAdminStmt               *sql.Stmt
-	createProductStmt             *sql.Stmt
-	deleteProductStmt             *sql.Stmt
-	getAdminStmt                  *sql.Stmt
-	getProductStmt                *sql.Stmt
-	listProductsByNameStmt        *sql.Stmt
-	listProductsByNameInitialStmt *sql.Stmt
-	updateAdminPwStmt             *sql.Stmt
-	updateProductIfNotNilStmt     *sql.Stmt
+	db                              DBTX
+	tx                              *sql.Tx
+	createAdminStmt                 *sql.Stmt
+	createProductStmt               *sql.Stmt
+	deleteProductStmt               *sql.Stmt
+	getAdminStmt                    *sql.Stmt
+	getProductStmt                  *sql.Stmt
+	listProductsStmt                *sql.Stmt
+	searchProductsByNameStmt        *sql.Stmt
+	searchProductsByNameInitialStmt *sql.Stmt
+	updateAdminPwStmt               *sql.Stmt
+	updateProductIfNotNilStmt       *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                            tx,
-		tx:                            tx,
-		createAdminStmt:               q.createAdminStmt,
-		createProductStmt:             q.createProductStmt,
-		deleteProductStmt:             q.deleteProductStmt,
-		getAdminStmt:                  q.getAdminStmt,
-		getProductStmt:                q.getProductStmt,
-		listProductsByNameStmt:        q.listProductsByNameStmt,
-		listProductsByNameInitialStmt: q.listProductsByNameInitialStmt,
-		updateAdminPwStmt:             q.updateAdminPwStmt,
-		updateProductIfNotNilStmt:     q.updateProductIfNotNilStmt,
+		db:                              tx,
+		tx:                              tx,
+		createAdminStmt:                 q.createAdminStmt,
+		createProductStmt:               q.createProductStmt,
+		deleteProductStmt:               q.deleteProductStmt,
+		getAdminStmt:                    q.getAdminStmt,
+		getProductStmt:                  q.getProductStmt,
+		listProductsStmt:                q.listProductsStmt,
+		searchProductsByNameStmt:        q.searchProductsByNameStmt,
+		searchProductsByNameInitialStmt: q.searchProductsByNameInitialStmt,
+		updateAdminPwStmt:               q.updateAdminPwStmt,
+		updateProductIfNotNilStmt:       q.updateProductIfNotNilStmt,
 	}
 }

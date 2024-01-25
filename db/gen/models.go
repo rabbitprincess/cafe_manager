@@ -27,5 +27,5 @@ type Product struct {
 	Description string         `json:"description"`
 	Barcode     []byte         `json:"barcode"`
 	Expire      time.Time      `json:"expire"`
-	Size        int32          `json:"size"`
+	Size        bool           `json:"size"`
 }

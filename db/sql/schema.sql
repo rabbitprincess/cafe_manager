@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   `description` varchar(200) NOT NULL DEFAULT '',
   `barcode` varbinary(200) NOT NULL DEFAULT '',
   `expire` timestamp NOT NULL,
-  `size` tinyint(4) NOT NULL DEFAULT 0,
+  `size` boolean NOT NULL DEFAULT 0,
   PRIMARY KEY (`seq`),
   UNIQUE KEY `name` (`name`) USING BTREE,
   INDEX `name_initial` (`name_initial`) USING BTREE

@@ -45,7 +45,7 @@ type CreateProductParams struct {
 	Description string         `json:"description"`
 	Barcode     []byte         `json:"barcode"`
 	Expire      time.Time      `json:"expire"`
-	Size        int32          `json:"size"`
+	Size        bool           `json:"size"`
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) error {
@@ -111,17 +111,12 @@ func (q *Queries) GetProduct(ctx context.Context, seq int64) (*Product, error) {
 	return &i, err
 }
 
-const listProductsByName = `-- name: ListProductsByName :many
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM product WHERE name LIKE ? LIMIT ?
+const listProducts = `-- name: ListProducts :many
+SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM product WHERE seq >= ? LIMIT 10
 `
 
-type ListProductsByNameParams struct {
-	Name  string `json:"name"`
-	Limit int32  `json:"limit"`
-}
-
-func (q *Queries) ListProductsByName(ctx context.Context, arg ListProductsByNameParams) ([]*Product, error) {
-	rows, err := q.query(ctx, q.listProductsByNameStmt, listProductsByName, arg.Name, arg.Limit)
+func (q *Queries) ListProducts(ctx context.Context, seq int64) ([]*Product, error) {
+	rows, err := q.query(ctx, q.listProductsStmt, listProducts, seq)
 	if err != nil {
 		return nil, err
 	}
@@ -154,17 +149,60 @@ func (q *Queries) ListProductsByName(ctx context.Context, arg ListProductsByName
 	return items, nil
 }
 
-const listProductsByNameInitial = `-- name: ListProductsByNameInitial :many
+const searchProductsByName = `-- name: SearchProductsByName :many
+SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM product WHERE name LIKE ? LIMIT ?
+`
+
+type SearchProductsByNameParams struct {
+	Name  string `json:"name"`
+	Limit int32  `json:"limit"`
+}
+
+func (q *Queries) SearchProductsByName(ctx context.Context, arg SearchProductsByNameParams) ([]*Product, error) {
+	rows, err := q.query(ctx, q.searchProductsByNameStmt, searchProductsByName, arg.Name, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Product
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.Seq,
+			&i.Category,
+			&i.Price,
+			&i.Cost,
+			&i.Name,
+			&i.NameInitial,
+			&i.Description,
+			&i.Barcode,
+			&i.Expire,
+			&i.Size,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const searchProductsByNameInitial = `-- name: SearchProductsByNameInitial :many
 SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM product WHERE name_initial LIKE ? LIMIT ?
 `
 
-type ListProductsByNameInitialParams struct {
+type SearchProductsByNameInitialParams struct {
 	NameInitial string `json:"name_initial"`
 	Limit       int32  `json:"limit"`
 }
 
-func (q *Queries) ListProductsByNameInitial(ctx context.Context, arg ListProductsByNameInitialParams) ([]*Product, error) {
-	rows, err := q.query(ctx, q.listProductsByNameInitialStmt, listProductsByNameInitial, arg.NameInitial, arg.Limit)
+func (q *Queries) SearchProductsByNameInitial(ctx context.Context, arg SearchProductsByNameInitialParams) ([]*Product, error) {
+	rows, err := q.query(ctx, q.searchProductsByNameInitialStmt, searchProductsByNameInitial, arg.NameInitial, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +272,7 @@ type UpdateProductIfNotNilParams struct {
 	Decription  sql.NullString `json:"decription"`
 	Barcode     sql.NullString `json:"barcode"`
 	Expire      sql.NullTime   `json:"expire"`
-	Size        sql.NullInt32  `json:"size"`
+	Size        sql.NullBool   `json:"size"`
 	Seq         int64          `json:"seq"`
 }
 
