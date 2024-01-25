@@ -20,8 +20,9 @@ var admin1 = gen.CreateAdminParams{
 func TestAdmin(t *testing.T) {
 	db, err := NewDB(ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
 	if err != nil {
-		t.Skip() // TODO : make mockup db server
+		t.Skip() // TODO : make db mockup server ( using docker testsuite )
 	}
+	defer db.Close()
 
 	// create admin
 	err = db.Job().Queries.CreateAdmin(context.Background(), admin1)
