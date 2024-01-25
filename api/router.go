@@ -24,6 +24,7 @@ func initRouter(serv *service.Service) {
 	menuRouter.Use(jwt.MiddlewareFunc()) // check auth
 	menuRouter.GET("/get", v1.GetMenu(serv.Menu))
 	menuRouter.GET("/search", v1.SearchMenu(serv.Menu))
+	menuRouter.GET("/list", v1.ListMenu(serv.Menu))
 	menuRouter.GET("/add", v1.AddMenu(serv.Menu))
 	menuRouter.GET("/update", v1.UpdateMenu(serv.Menu))
 	menuRouter.GET("/delete", v1.DeleteMenu(serv.Menu))
