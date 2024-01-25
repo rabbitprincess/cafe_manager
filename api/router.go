@@ -7,8 +7,7 @@ import (
 	"github.com/gokch/cafe_manager/service"
 )
 
-func initRouter(serv *service.Service) {
-	r := gin.Default()
+func InitRouter(serv *service.Service, r *gin.Engine) {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	// r.NoRoute()

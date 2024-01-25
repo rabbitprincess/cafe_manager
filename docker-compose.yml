@@ -12,16 +12,19 @@ services:
       - 3306:3306
     volumes:
       - ./db/sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-  # cafe_manager:
-  #   container_name: cafe_manager
-  #   image: cafe_manager:0.0.0
-  #   ports:
-  #    - 3000:3000
-  #   privileged: true
-  #   command: cafe_manager
-  #     - --dburl=mysql:3306
-  #     - --dbuser=root
-  #     - --dbpass=1234
-  #   network_mode: host
-  #   depends_on:
-  #     - mysql
+    cafe_manager:
+      container_name: cafe_manager
+      image: cafe_manager:0.0.0
+      ports:
+        - 3000:3000
+      privileged: true
+      command: cafe_manager
+        - --dbaddr=mysql
+        - --dbport=3306
+        - --dbuser=root
+        - --dbpass=1234
+        - --dbname=cafe
+        - --port=3000
+      network_mode: host
+      depends_on:
+        - mysql
