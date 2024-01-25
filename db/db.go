@@ -25,6 +25,10 @@ type DB struct {
 	db *sql.DB
 }
 
+func (t *DB) Close() error {
+	return t.db.Close()
+}
+
 func (t *DB) Raw() *sql.DB {
 	return t.db
 }
