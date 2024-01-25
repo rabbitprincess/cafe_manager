@@ -60,9 +60,10 @@ func (t *DB) TxJobFunc(isoLevel sql.IsolationLevel, readonly bool, fn func(*Tx) 
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
-	if err = fn(tx); err != nil {
-		return tx.Rollback()
+	if err = fn(tx); err == nil {
+		return tx.Commit()
 	}
-	return tx.Commit()
+	return err
 }
