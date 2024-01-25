@@ -10,7 +10,7 @@ import (
 
 // TODO
 func TestExec(t *testing.T) {
-	db, err := Connect(ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
+	db, err := NewDB(ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
 	require.NoError(t, err)
 
 	err = db.Job().Queries.CreateAdmin(context.Background(), sqlc.CreateAdminParams{

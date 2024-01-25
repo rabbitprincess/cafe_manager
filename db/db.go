@@ -4,8 +4,8 @@ import (
 	"database/sql"
 )
 
-func Connect(conn ConnectFunc) (db *Conn, err error) {
-	db = &Conn{}
+func NewDB(conn ConnectFunc) (db *DB, err error) {
+	db = &DB{}
 	db.DriverName, db.Dsn, db.DbName = conn()
 
 	if db.db, err = sql.Open(db.DriverName, db.Dsn); err != nil {
@@ -17,7 +17,7 @@ func Connect(conn ConnectFunc) (db *Conn, err error) {
 	return db, err
 }
 
-type Conn struct {
+type DB struct {
 	DriverName string
 	Dsn        string
 	DbName     string
@@ -25,11 +25,11 @@ type Conn struct {
 	db *sql.DB
 }
 
-func (t *Conn) Raw() *sql.DB {
+func (t *DB) Raw() *sql.DB {
 	return t.db
 }
 
-func (t *Conn) SetOpenConns(openConns, idleConns int) {
+func (t *DB) SetOpenConns(openConns, idleConns int) {
 	if openConns > 0 {
 		t.db.SetMaxOpenConns(openConns)
 	}
@@ -38,12 +38,12 @@ func (t *Conn) SetOpenConns(openConns, idleConns int) {
 	}
 }
 
-func (t *Conn) Job() *Job {
+func (t *DB) Job() *Job {
 	job := NewJob(t.db)
 	return job
 }
 
-func (t *Conn) TxJob(isoLevel sql.IsolationLevel, readonly bool) (tx *Tx, err error) {
+func (t *DB) TxJob(isoLevel sql.IsolationLevel, readonly bool) (tx *Tx, err error) {
 	tx, err = NewTx(t.db, isoLevel, readonly)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (t *Conn) TxJob(isoLevel sql.IsolationLevel, readonly bool) (tx *Tx, err er
 	return tx, nil
 }
 
-func (t *Conn) TxJobFunc(isoLevel sql.IsolationLevel, readonly bool, fn func(*Tx) error) (err error) {
+func (t *DB) TxJobFunc(isoLevel sql.IsolationLevel, readonly bool, fn func(*Tx) error) (err error) {
 	tx, err := t.TxJob(isoLevel, readonly)
 	if err != nil {
 		return err
