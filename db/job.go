@@ -18,8 +18,8 @@ func NewJob(db *sql.DB) *Job {
 }
 
 type Job struct {
-	Queries *sqlc.Queries
-	db      *sql.DB
+	*sqlc.Queries
+	db *sql.DB
 }
 
 // tx job
@@ -38,9 +38,9 @@ func NewTx(db *sql.DB, isoLevel sql.IsolationLevel, readOnly bool) (*Tx, error) 
 }
 
 type Tx struct {
-	closed  atomic.Bool
-	Queries *sqlc.Queries
-	tx      *sql.Tx
+	closed atomic.Bool
+	*sqlc.Queries
+	tx *sql.Tx
 }
 
 func (t *Tx) Commit() error {

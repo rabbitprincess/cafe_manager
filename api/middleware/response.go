@@ -7,8 +7,8 @@ import (
 )
 
 type Response struct {
-	Meta Meta `json:"meta"`
-	data map[string]interface{}
+	Meta Meta        `json:"meta"`
+	Data interface{} `json:"data"`
 }
 
 type Meta struct {
@@ -16,40 +16,26 @@ type Meta struct {
 	Message string `json:"message"`
 }
 
-func ResponseFormat(ctx *gin.Context) {
-	ctx.Next()
+func HandleError(c *gin.Context, code int, err error) {
+	c.JSON(code, Response{
+		Meta: Meta{
+			Code:    code,
+			Message: err.Error(),
+		},
+		Data: nil,
+	})
+}
 
-	// 처리 중에 오류가 있는지 확인
-	err := ctx.Errors.Last()
-	if err != nil {
-		// 오류가 있으면 처리하고 오류 응답을 전송
-		code := http.StatusInternalServerError
-		message := err.Error()
-
-		ctx.JSON(code, Response{
-			Meta: Meta{
-				Code:    code,
-				Message: message,
-			},
-			data: nil,
-		})
-	} else {
-		// 오류가 없으면 성공 응답을 전송
-		data := ctx.GetStringMap("data")
-		var code int
-		if len(data) >= 0 {
-			code = http.StatusOK
-		} else {
-			code = http.StatusNoContent
-		}
-
-		ctx.JSON(code, Response{
-			Meta: Meta{
-				Code:    code,
-				Message: "ok",
-			},
-			data: ctx.GetStringMap("data"),
-		})
+func HandleData(c *gin.Context, data interface{}) {
+	var code int
+	if data == nil {
+		code = http.StatusNoContent
 	}
-	return
+	c.JSON(code, Response{
+		Meta: Meta{
+			Code:    code,
+			Message: "ok",
+		},
+		Data: data,
+	})
 }
