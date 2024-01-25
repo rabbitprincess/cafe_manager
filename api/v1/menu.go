@@ -10,7 +10,7 @@ import (
 	"github.com/gokch/cafe_manager/utilx"
 )
 
-// FIXME : need structured error
+// TODO : need structured error
 var (
 	ErrSeqNotExist    = errors.New("seq is not exist")
 	ErrSeqInvalidType = errors.New("invalid seq type")
