@@ -2,17 +2,32 @@ package db
 
 import (
 	"database/sql"
+	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
-func NewDB(conn ConnectFunc) (db *DB, err error) {
+func NewDB(timeout int, conn ConnectFunc) (db *DB, err error) {
 	db = &DB{}
 	db.DriverName, db.Dsn, db.DbName = conn()
 
-	if db.db, err = sql.Open(db.DriverName, db.Dsn); err != nil {
-		return nil, err
-	}
-	if err = db.db.Ping(); err != nil {
-		return nil, err
+	var cntRetry = 0
+	for {
+		if cntRetry > timeout {
+			return nil, err
+		} else {
+			log.Error().Err(err).Int("count", cntRetry).Msg("Failed to connect db. retry...")
+			cntRetry += 3
+			time.Sleep(3 * time.Second)
+		}
+
+		if db.db, err = sql.Open(db.DriverName, db.Dsn); err != nil {
+			continue
+		}
+		if err = db.db.Ping(); err != nil {
+			continue
+		}
+		break
 	}
 	return db, err
 }

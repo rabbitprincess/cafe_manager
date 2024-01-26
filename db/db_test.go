@@ -9,15 +9,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var admin1 = gen.CreateAdminParams{
-	ID:    "admin1",
-	Name:  "admin1",
-	Pw:    []byte("951357abcde!"),
-	Phone: "010-1234-5678",
-}
+var (
+	admin1 = gen.CreateAdminParams{
+		ID:    "admin1",
+		Name:  "admin1",
+		Pw:    []byte("951357abcde!"),
+		Phone: "010-1234-5678",
+	}
+)
 
 func TestAdmin(t *testing.T) {
-	db, err := NewDB(ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
+	db, err := NewDB(30, ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
 	if err != nil {
 		t.Skip() // TODO : make db mockup server ( using docker testsuite )
 	}

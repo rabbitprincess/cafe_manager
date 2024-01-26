@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gokch/cafe_manager/api"
@@ -23,7 +22,7 @@ var (
 	rootCmd = cobra.Command{
 		Use:   "cafe_manager",
 		Short: "Cafe manage program",
-		Long:  "Cafe manager program",
+		Long:  "Cafe manage program",
 		Run:   rootRun,
 	}
 
@@ -46,19 +45,15 @@ func init() {
 }
 
 func rootRun(cmd *cobra.Command, args []string) {
-	var database *db.DB
-	var err error
-	for {
-		database, err = db.NewDB(db.ConnectFuncMysql(dbAddress, dbPort, dbUserName, dbPassword, dbName))
-		if err == nil {
-			break
-		}
-		log.Warn().Err(err).Strs("args", []string{dbAddress, dbPort, dbUserName, dbPassword, dbName}).Msg("Failed to connect db. retry...")
-		time.Sleep(3 * time.Second)
+	// init db
+	database, err := db.NewDB(10, db.ConnectFuncMysql(dbAddress, dbPort, dbUserName, dbPassword, dbName))
+	if err != nil {
+		log.Fatal().Err(err).Strs("args", []string{dbAddress, dbPort, dbUserName, dbPassword, dbName}).Msg("Failed to connect db. please check db connection")
 	}
+
+	// init service and api
 	router := gin.Default()
 	api.InitRouter(service.NewService(database), router)
-
 	go func() {
 		err = router.Run(":" + port)
 		if err != nil {
@@ -66,7 +61,7 @@ func rootRun(cmd *cobra.Command, args []string) {
 		}
 	}()
 
-	// Wait main routine to stop
+	// graceful shutdown
 	interrupt := utilx.HandleKillSig(func() {
 		database.Close()
 	})
