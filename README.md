@@ -26,10 +26,8 @@ Flags:
 
 ## Build and run using Docker Compose
 
-    go install github.com/gokch/cafe_manager@latest
-    cd $GOPATH/src/github.com/gokch/cafe_manager
-    docker compose up
-    
+    git clone https://github.com/gokch/cafe_manager
+    cd cafe_manager && docker compose up
 
 # 해야될거 ( 임시 )
 - [ ] 1. jwt 커스터마이징 및 테스트
