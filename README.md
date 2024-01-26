@@ -3,7 +3,13 @@
 This is program for cafe manager
 
 
-## Usage With flags
+## Build
+
+    go get https://github.com/gokch/cafe_manager
+    cd $GOPATH/src/github.com/gokch/cafe_manager
+    make
+
+## Run With flags
 
 ```
 Usage:
@@ -19,11 +25,7 @@ Flags:
   -p, --port string     port (default "3000")
 ```
 
-## Build
 
-    go get github.com/aergoio/aergo-indexer
-    cd $GOPATH/src/github.com/aergoio/aergo-indexer
-    make
 
 ## Build and run using Docker Compose
 
