@@ -9,6 +9,6 @@ RUN go mod download
 ADD . .
 RUN make all
 
-FROM alpine
+FROM golang:1.21-alpine
 COPY --from=builder /app/bin/* /usr/local/bin/
 CMD ["cafe_manager"]
