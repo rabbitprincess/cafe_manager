@@ -5,15 +5,14 @@ This is program for cafe manager
 
 ## Build
 
-    go get https://github.com/gokch/cafe_manager
-    cd $GOPATH/src/github.com/gokch/cafe_manager
-    make
+    git clone https://github.com/gokch/cafe_manager
+    cd cafe_manager && make
 
 ## Run With flags
 
 ```
 Usage:
-  cafe_manager [flags]
+  ./bin/cafe_manager [flags]
 
 Flags:
   -A, --dbaddr string   db address (default "localhost")
@@ -25,11 +24,12 @@ Flags:
   -p, --port string     port (default "3000")
 ```
 
-
-
 ## Build and run using Docker Compose
 
-    docker compose -p aergo_indexer up
+    go install github.com/gokch/cafe_manager@latest
+    cd $GOPATH/src/github.com/gokch/cafe_manager
+    docker compose up
+    
 
 # 해야될거 ( 임시 )
 - [ ] 1. jwt 커스터마이징 및 테스트
