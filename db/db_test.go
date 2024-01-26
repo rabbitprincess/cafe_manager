@@ -19,13 +19,13 @@ var (
 )
 
 func TestAdmin(t *testing.T) {
-	db, err := NewDB(30, ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
+	db, err := NewDB(1, ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
 	if err != nil {
 		t.Skip() // TODO : make db mockup server ( using docker testsuite )
 	}
 	defer db.Close()
 
-	// create admin
+	// create adminw
 	err = db.Job().CreateAdmin(context.Background(), admin1)
 	require.NoError(t, err)
 

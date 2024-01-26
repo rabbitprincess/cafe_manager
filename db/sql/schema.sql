@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `seq` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `id` varchar(50) NOT NULL DEFAULT '',
   `name` varchar(50) NOT NULL DEFAULT '',
-  `pw` varbinary(50) NOT NULL DEFAULT '',
+  `pw` varbinary(128) NOT NULL DEFAULT '',
   `phone` varchar(15) NOT NULL DEFAULT '',
   PRIMARY KEY (`seq`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -18,8 +18,8 @@ var (
 
 func GetMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		seq, exist := c.Params.Get("seq")
-		if exist != true {
+		seq := c.Query("seq")
+		if seq == "" {
 			middleware.HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
 			return
 		}
@@ -41,8 +41,8 @@ func GetMenu(p *service.Menu) gin.HandlerFunc {
 
 func ListMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		seq, exist := c.Get("seq")
-		if exist != true {
+		seq := c.Query("seq")
+		if seq == "" {
 			middleware.HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
 			return
 		}

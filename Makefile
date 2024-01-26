@@ -1,4 +1,4 @@
-make all: sqlcgen build
+make all: build
 
 sqlcgen:
 	cd db && sqlc generate

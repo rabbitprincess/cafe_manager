@@ -16,8 +16,8 @@ func InitRouter(serv *service.Service, r *gin.Engine) {
 
 	adminRouter := r.Group("/admin")
 	adminRouter.GET("/register", v1.Register(serv.Admin))
-	adminRouter.POST("/login", v1.Login(serv.Admin), jwt.LoginHandler)
-	adminRouter.POST("/logout", v1.Logout(serv.Admin), jwt.LogoutHandler)
+	adminRouter.GET("/login", v1.Login(serv.Admin), jwt.LoginHandler)
+	adminRouter.GET("/logout", v1.Logout(serv.Admin), jwt.LogoutHandler)
 
 	menuRouter := r.Group("/menu")
 	menuRouter.Use(jwt.MiddlewareFunc()) // check auth

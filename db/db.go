@@ -7,18 +7,22 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const (
+	TimeoutSleepSecond = 3
+)
+
 func NewDB(timeout int, conn ConnectFunc) (db *DB, err error) {
 	db = &DB{}
 	db.DriverName, db.Dsn, db.DbName = conn()
 
 	var cntRetry = 0
 	for {
-		if cntRetry*3 > timeout {
+		if cntRetry*TimeoutSleepSecond > timeout {
 			return nil, err
 		} else {
 			log.Error().Err(err).Int("count", cntRetry).Msg("Failed to connect db. retry...")
 			cntRetry++
-			time.Sleep(3 * time.Second)
+			time.Sleep(TimeoutSleepSecond * time.Second)
 		}
 
 		if db.db, err = sql.Open(db.DriverName, db.Dsn); err != nil {
