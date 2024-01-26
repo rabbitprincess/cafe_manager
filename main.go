@@ -36,12 +36,12 @@ var (
 
 func init() {
 	fs := rootCmd.PersistentFlags()
-	fs.StringVar(&dbAddress, "dbaddr", "localhost", "db address")
-	fs.StringVar(&dbPort, "dbport", "3306", "db port")
-	fs.StringVar(&dbUserName, "dbuser", "root", "db user name")
-	fs.StringVar(&dbPassword, "dbpass", "1234", "db password")
-	fs.StringVar(&dbName, "dbname", "cafe", "db name")
-	fs.StringVar(&port, "port", "3000", "port")
+	fs.StringVarP(&dbAddress, "dbaddr", "A", "localhost", "db address")
+	fs.StringVarP(&dbPort, "dbport", "P", "3306", "db port")
+	fs.StringVarP(&dbUserName, "dbuser", "u", "root", "db user name")
+	fs.StringVarP(&dbPassword, "dbpass", "c", "1234", "db password")
+	fs.StringVarP(&dbName, "dbname", "n", "cafe", "db name")
+	fs.StringVarP(&port, "port", "p", "3000", "port")
 }
 
 func rootRun(cmd *cobra.Command, args []string) {

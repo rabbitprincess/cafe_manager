@@ -1,5 +1,34 @@
 # cafe_manager
 
+This is program for cafe manager
+
+
+## Usage With flags
+
+```
+Usage:
+  cafe_manager [flags]
+
+Flags:
+  -A, --dbaddr string   db address (default "localhost")
+  -n, --dbname string   db name (default "cafe")
+  -c, --dbpass string   db password (default "1234")
+  -P, --dbport string   db port (default "3306")
+  -u, --dbuser string   db user name (default "root")
+  -h, --help            help for cafe_manager
+  -p, --port string     port (default "3000")
+```
+
+## Build
+
+    go get github.com/aergoio/aergo-indexer
+    cd $GOPATH/src/github.com/aergoio/aergo-indexer
+    make
+
+## Build and run using Docker Compose
+
+    docker compose -p aergo_indexer up
+
 # 해야될거 ( 임시 )
 - [ ] 1. jwt 커스터마이징 및 테스트
 - [ ] 2. req / res 타입 정의 swagger generate
