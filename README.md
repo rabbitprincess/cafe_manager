@@ -1,7 +1,6 @@
-# cafe_manager
+# cafe manager
 
-This is program for cafe manager
-
+manager program for cafe
 
 ## Build
 
