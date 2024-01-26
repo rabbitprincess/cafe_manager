@@ -7,7 +7,7 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 ADD . .
-RUN make build
+RUN make all
 
 FROM alpine
 COPY --from=builder /app/bin/* /usr/local/bin/

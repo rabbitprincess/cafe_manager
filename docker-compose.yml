@@ -2,7 +2,7 @@ version: '3.2'
 services:
   db_mysql:
     container_name: db_mysql
-    image: mysql:5.7
+    image: mysql:5.7 # arm64 지원 시 mysql:8 사용
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_USER: user
