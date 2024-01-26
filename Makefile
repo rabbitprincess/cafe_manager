@@ -1,7 +1,7 @@
 make all: build
 
 sqlcgen:
-	cd db && sqlc generate
+	cd db/sql && sqlc generate
 
 build: */*.go go.sum go.mod
 	go build -o bin/cafe_manager main.go
