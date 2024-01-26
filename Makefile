@@ -1,3 +1,5 @@
+make all: build
+
 build: */*.go go.sum go.mod
 	go build -o bin/cafe_manager main.go
 
