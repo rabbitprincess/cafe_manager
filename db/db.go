@@ -13,11 +13,11 @@ func NewDB(timeout int, conn ConnectFunc) (db *DB, err error) {
 
 	var cntRetry = 0
 	for {
-		if cntRetry > timeout {
+		if cntRetry*3 > timeout {
 			return nil, err
 		} else {
 			log.Error().Err(err).Int("count", cntRetry).Msg("Failed to connect db. retry...")
-			cntRetry += 3
+			cntRetry++
 			time.Sleep(3 * time.Second)
 		}
 

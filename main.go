@@ -46,7 +46,7 @@ func init() {
 
 func rootRun(cmd *cobra.Command, args []string) {
 	// init db
-	database, err := db.NewDB(10, db.ConnectFuncMysql(dbAddress, dbPort, dbUserName, dbPassword, dbName))
+	database, err := db.NewDB(30, db.ConnectFuncMysql(dbAddress, dbPort, dbUserName, dbPassword, dbName))
 	if err != nil {
 		log.Fatal().Err(err).Strs("args", []string{dbAddress, dbPort, dbUserName, dbPassword, dbName}).Msg("Failed to connect db. please check db connection")
 	}
