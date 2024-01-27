@@ -24,7 +24,7 @@ type Menu struct {
 	Name        string    `json:"name"`
 	NameInitial string    `json:"name_initial"`
 	Description string    `json:"description"`
-	Barcode     []byte    `json:"barcode"`
 	Expire      time.Time `json:"expire"`
+	Barcode     string    `json:"barcode"`
 	Size        string    `json:"size"`
 }

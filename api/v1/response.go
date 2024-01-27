@@ -28,13 +28,18 @@ func HandleError(c *gin.Context, code int, err error) {
 
 func HandleData(c *gin.Context, data interface{}) {
 	var code int
+	var message string
 	if data == nil {
 		code = http.StatusNoContent
+		message = "no content"
+	} else {
+		code = http.StatusOK
+		message = "ok"
 	}
 	c.JSON(code, Response{
 		Meta: Meta{
 			Code:    code,
-			Message: "ok",
+			Message: message,
 		},
 		Data: data,
 	})

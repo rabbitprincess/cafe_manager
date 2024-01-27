@@ -8,7 +8,7 @@ SELECT * FROM admin WHERE id = ? LIMIT 1;
 UPDATE admin SET pw = ? WHERE id = ?;
 
 -- name: CreateMenu :exec
-INSERT INTO menu (category, price, cost, name, name_initial, description, barcode, expire, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO menu (category, price, cost, name, name_initial, description, expire, barcode, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: GetMenu :one
 SELECT * FROM menu WHERE seq = ? LIMIT 1;

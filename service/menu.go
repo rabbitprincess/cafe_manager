@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/gokch/cafe_manager/db"
@@ -55,11 +54,7 @@ func (m *Menu) SearchMenu(name string) ([]*gen.Menu, error) {
 	return menus, nil
 }
 
-func (m *Menu) AddMenu(category, name, description string, price, cost, expire int64, size string) error {
-	barcode, err := utilx.Barcode(name)
-	if err != nil {
-		return fmt.Errorf("failed to generate barcode from name | name : %s | err : %w", name, err)
-	}
+func (m *Menu) AddMenu(category, name, description string, price, cost, expire int64, barcode, size string) error {
 	return m.db.TxJobFunc(sql.LevelDefault, false, func(tx *db.Tx) error {
 		if err := tx.CreateMenu(context.Background(), gen.CreateMenuParams{
 			Category:    category,
@@ -67,8 +62,8 @@ func (m *Menu) AddMenu(category, name, description string, price, cost, expire i
 			Cost:        int32(cost),
 			Name:        name,
 			Description: description,
-			Barcode:     []byte(barcode.Content()),
 			Expire:      time.Unix(expire, 0),
+			Barcode:     barcode,
 			Size:        size,
 		}); err != nil {
 			return err
@@ -77,33 +72,36 @@ func (m *Menu) AddMenu(category, name, description string, price, cost, expire i
 	})
 }
 
-func (m *Menu) UpdateMenu(category, name, description *string, price, cost, expire *int64, size *string) error {
+func (m *Menu) UpdateMenu(category, name, description string, price, cost, expire int64, barcode, size string) error {
 	var categoryNull, nameNull, decriptionNull sql.NullString
-	if category != nil {
-		categoryNull = sql.NullString{String: *category, Valid: true}
+	if category != "" {
+		categoryNull = sql.NullString{String: category, Valid: true}
 	}
-	if name != nil {
-		nameNull = sql.NullString{String: *name, Valid: true}
+	if name != "" {
+		nameNull = sql.NullString{String: name, Valid: true}
 	}
-	if description != nil {
-		decriptionNull = sql.NullString{String: *description, Valid: true}
+	if description != "" {
+		decriptionNull = sql.NullString{String: description, Valid: true}
 	}
 
 	var priceNull, costNull sql.NullInt32
-	if price != nil {
-		priceNull = sql.NullInt32{Int32: int32(*price), Valid: true}
+	if price != 0 {
+		priceNull = sql.NullInt32{Int32: int32(price), Valid: true}
 	}
-	if cost != nil {
-		costNull = sql.NullInt32{Int32: int32(*cost), Valid: true}
+	if cost != 0 {
+		costNull = sql.NullInt32{Int32: int32(cost), Valid: true}
 	}
 
 	var expireNull sql.NullTime
-	if expire != nil {
-		expireNull = sql.NullTime{Time: time.Unix(*expire, 0), Valid: true}
+	if expire != 0 {
+		expireNull = sql.NullTime{Time: time.Unix(expire, 0), Valid: true}
 	}
-	var sizeNull sql.NullString
-	if size != nil {
-		sizeNull = sql.NullString{String: *size, Valid: true}
+	var barcodeNull, sizeNull sql.NullString
+	if barcode != "" {
+		barcodeNull = sql.NullString{String: barcode, Valid: true}
+	}
+	if size != "" {
+		sizeNull = sql.NullString{String: size, Valid: true}
 	}
 	return m.db.TxJobFunc(sql.LevelDefault, false, func(tx *db.Tx) error {
 		if err := tx.UpdateMenuIfNotNil(context.Background(), gen.UpdateMenuIfNotNilParams{
@@ -113,6 +111,7 @@ func (m *Menu) UpdateMenu(category, name, description *string, price, cost, expi
 			Name:       nameNull,
 			Decription: decriptionNull,
 			Expire:     expireNull,
+			Barcode:    barcodeNull,
 			Size:       sizeNull,
 		}); err != nil {
 			return err

@@ -33,7 +33,7 @@ func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) error 
 }
 
 const createMenu = `-- name: CreateMenu :exec
-INSERT INTO menu (category, price, cost, name, name_initial, description, barcode, expire, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+INSERT INTO menu (category, price, cost, name, name_initial, description, expire, barcode, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type CreateMenuParams struct {
@@ -43,8 +43,8 @@ type CreateMenuParams struct {
 	Name        string    `json:"name"`
 	NameInitial string    `json:"name_initial"`
 	Description string    `json:"description"`
-	Barcode     []byte    `json:"barcode"`
 	Expire      time.Time `json:"expire"`
+	Barcode     string    `json:"barcode"`
 	Size        string    `json:"size"`
 }
 
@@ -56,8 +56,8 @@ func (q *Queries) CreateMenu(ctx context.Context, arg CreateMenuParams) error {
 		arg.Name,
 		arg.NameInitial,
 		arg.Description,
-		arg.Barcode,
 		arg.Expire,
+		arg.Barcode,
 		arg.Size,
 	)
 	return err
@@ -90,7 +90,7 @@ func (q *Queries) GetAdmin(ctx context.Context, id string) (*Admin, error) {
 }
 
 const getMenu = `-- name: GetMenu :one
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM menu WHERE seq = ? LIMIT 1
+SELECT seq, category, price, cost, name, name_initial, description, expire, barcode, size FROM menu WHERE seq = ? LIMIT 1
 `
 
 func (q *Queries) GetMenu(ctx context.Context, seq uint64) (*Menu, error) {
@@ -104,15 +104,15 @@ func (q *Queries) GetMenu(ctx context.Context, seq uint64) (*Menu, error) {
 		&i.Name,
 		&i.NameInitial,
 		&i.Description,
-		&i.Barcode,
 		&i.Expire,
+		&i.Barcode,
 		&i.Size,
 	)
 	return &i, err
 }
 
 const listMenus = `-- name: ListMenus :many
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM menu WHERE seq >= ? LIMIT 10
+SELECT seq, category, price, cost, name, name_initial, description, expire, barcode, size FROM menu WHERE seq >= ? LIMIT 10
 `
 
 func (q *Queries) ListMenus(ctx context.Context, seq uint64) ([]*Menu, error) {
@@ -132,8 +132,8 @@ func (q *Queries) ListMenus(ctx context.Context, seq uint64) ([]*Menu, error) {
 			&i.Name,
 			&i.NameInitial,
 			&i.Description,
-			&i.Barcode,
 			&i.Expire,
+			&i.Barcode,
 			&i.Size,
 		); err != nil {
 			return nil, err
@@ -150,7 +150,7 @@ func (q *Queries) ListMenus(ctx context.Context, seq uint64) ([]*Menu, error) {
 }
 
 const searchMenusByName = `-- name: SearchMenusByName :many
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM menu WHERE name LIKE ? LIMIT ?
+SELECT seq, category, price, cost, name, name_initial, description, expire, barcode, size FROM menu WHERE name LIKE ? LIMIT ?
 `
 
 type SearchMenusByNameParams struct {
@@ -175,8 +175,8 @@ func (q *Queries) SearchMenusByName(ctx context.Context, arg SearchMenusByNamePa
 			&i.Name,
 			&i.NameInitial,
 			&i.Description,
-			&i.Barcode,
 			&i.Expire,
+			&i.Barcode,
 			&i.Size,
 		); err != nil {
 			return nil, err
@@ -193,7 +193,7 @@ func (q *Queries) SearchMenusByName(ctx context.Context, arg SearchMenusByNamePa
 }
 
 const searchMenusByNameInitial = `-- name: SearchMenusByNameInitial :many
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM menu WHERE name_initial LIKE ? LIMIT ?
+SELECT seq, category, price, cost, name, name_initial, description, expire, barcode, size FROM menu WHERE name_initial LIKE ? LIMIT ?
 `
 
 type SearchMenusByNameInitialParams struct {
@@ -218,8 +218,8 @@ func (q *Queries) SearchMenusByNameInitial(ctx context.Context, arg SearchMenusB
 			&i.Name,
 			&i.NameInitial,
 			&i.Description,
-			&i.Barcode,
 			&i.Expire,
+			&i.Barcode,
 			&i.Size,
 		); err != nil {
 			return nil, err
