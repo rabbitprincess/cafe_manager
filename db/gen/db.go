@@ -27,32 +27,32 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createAdminStmt, err = db.PrepareContext(ctx, createAdmin); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateAdmin: %w", err)
 	}
-	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
+	if q.createMenuStmt, err = db.PrepareContext(ctx, createMenu); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateMenu: %w", err)
 	}
-	if q.deleteProductStmt, err = db.PrepareContext(ctx, deleteProduct); err != nil {
-		return nil, fmt.Errorf("error preparing query DeleteProduct: %w", err)
+	if q.deleteMenuStmt, err = db.PrepareContext(ctx, deleteMenu); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteMenu: %w", err)
 	}
 	if q.getAdminStmt, err = db.PrepareContext(ctx, getAdmin); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAdmin: %w", err)
 	}
-	if q.getProductStmt, err = db.PrepareContext(ctx, getProduct); err != nil {
-		return nil, fmt.Errorf("error preparing query GetProduct: %w", err)
+	if q.getMenuStmt, err = db.PrepareContext(ctx, getMenu); err != nil {
+		return nil, fmt.Errorf("error preparing query GetMenu: %w", err)
 	}
-	if q.listProductsStmt, err = db.PrepareContext(ctx, listProducts); err != nil {
-		return nil, fmt.Errorf("error preparing query ListProducts: %w", err)
+	if q.listMenusStmt, err = db.PrepareContext(ctx, listMenus); err != nil {
+		return nil, fmt.Errorf("error preparing query ListMenus: %w", err)
 	}
-	if q.searchProductsByNameStmt, err = db.PrepareContext(ctx, searchProductsByName); err != nil {
-		return nil, fmt.Errorf("error preparing query SearchProductsByName: %w", err)
+	if q.searchMenusByNameStmt, err = db.PrepareContext(ctx, searchMenusByName); err != nil {
+		return nil, fmt.Errorf("error preparing query SearchMenusByName: %w", err)
 	}
-	if q.searchProductsByNameInitialStmt, err = db.PrepareContext(ctx, searchProductsByNameInitial); err != nil {
-		return nil, fmt.Errorf("error preparing query SearchProductsByNameInitial: %w", err)
+	if q.searchMenusByNameInitialStmt, err = db.PrepareContext(ctx, searchMenusByNameInitial); err != nil {
+		return nil, fmt.Errorf("error preparing query SearchMenusByNameInitial: %w", err)
 	}
 	if q.updateAdminPwStmt, err = db.PrepareContext(ctx, updateAdminPw); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateAdminPw: %w", err)
 	}
-	if q.updateProductIfNotNilStmt, err = db.PrepareContext(ctx, updateProductIfNotNil); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateProductIfNotNil: %w", err)
+	if q.updateMenuIfNotNilStmt, err = db.PrepareContext(ctx, updateMenuIfNotNil); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateMenuIfNotNil: %w", err)
 	}
 	return &q, nil
 }
@@ -64,14 +64,14 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createAdminStmt: %w", cerr)
 		}
 	}
-	if q.createProductStmt != nil {
-		if cerr := q.createProductStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createProductStmt: %w", cerr)
+	if q.createMenuStmt != nil {
+		if cerr := q.createMenuStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createMenuStmt: %w", cerr)
 		}
 	}
-	if q.deleteProductStmt != nil {
-		if cerr := q.deleteProductStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deleteProductStmt: %w", cerr)
+	if q.deleteMenuStmt != nil {
+		if cerr := q.deleteMenuStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteMenuStmt: %w", cerr)
 		}
 	}
 	if q.getAdminStmt != nil {
@@ -79,24 +79,24 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getAdminStmt: %w", cerr)
 		}
 	}
-	if q.getProductStmt != nil {
-		if cerr := q.getProductStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getProductStmt: %w", cerr)
+	if q.getMenuStmt != nil {
+		if cerr := q.getMenuStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getMenuStmt: %w", cerr)
 		}
 	}
-	if q.listProductsStmt != nil {
-		if cerr := q.listProductsStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listProductsStmt: %w", cerr)
+	if q.listMenusStmt != nil {
+		if cerr := q.listMenusStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listMenusStmt: %w", cerr)
 		}
 	}
-	if q.searchProductsByNameStmt != nil {
-		if cerr := q.searchProductsByNameStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing searchProductsByNameStmt: %w", cerr)
+	if q.searchMenusByNameStmt != nil {
+		if cerr := q.searchMenusByNameStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing searchMenusByNameStmt: %w", cerr)
 		}
 	}
-	if q.searchProductsByNameInitialStmt != nil {
-		if cerr := q.searchProductsByNameInitialStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing searchProductsByNameInitialStmt: %w", cerr)
+	if q.searchMenusByNameInitialStmt != nil {
+		if cerr := q.searchMenusByNameInitialStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing searchMenusByNameInitialStmt: %w", cerr)
 		}
 	}
 	if q.updateAdminPwStmt != nil {
@@ -104,9 +104,9 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateAdminPwStmt: %w", cerr)
 		}
 	}
-	if q.updateProductIfNotNilStmt != nil {
-		if cerr := q.updateProductIfNotNilStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateProductIfNotNilStmt: %w", cerr)
+	if q.updateMenuIfNotNilStmt != nil {
+		if cerr := q.updateMenuIfNotNilStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateMenuIfNotNilStmt: %w", cerr)
 		}
 	}
 	return err
@@ -146,33 +146,33 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                              DBTX
-	tx                              *sql.Tx
-	createAdminStmt                 *sql.Stmt
-	createProductStmt               *sql.Stmt
-	deleteProductStmt               *sql.Stmt
-	getAdminStmt                    *sql.Stmt
-	getProductStmt                  *sql.Stmt
-	listProductsStmt                *sql.Stmt
-	searchProductsByNameStmt        *sql.Stmt
-	searchProductsByNameInitialStmt *sql.Stmt
-	updateAdminPwStmt               *sql.Stmt
-	updateProductIfNotNilStmt       *sql.Stmt
+	db                           DBTX
+	tx                           *sql.Tx
+	createAdminStmt              *sql.Stmt
+	createMenuStmt               *sql.Stmt
+	deleteMenuStmt               *sql.Stmt
+	getAdminStmt                 *sql.Stmt
+	getMenuStmt                  *sql.Stmt
+	listMenusStmt                *sql.Stmt
+	searchMenusByNameStmt        *sql.Stmt
+	searchMenusByNameInitialStmt *sql.Stmt
+	updateAdminPwStmt            *sql.Stmt
+	updateMenuIfNotNilStmt       *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                              tx,
-		tx:                              tx,
-		createAdminStmt:                 q.createAdminStmt,
-		createProductStmt:               q.createProductStmt,
-		deleteProductStmt:               q.deleteProductStmt,
-		getAdminStmt:                    q.getAdminStmt,
-		getProductStmt:                  q.getProductStmt,
-		listProductsStmt:                q.listProductsStmt,
-		searchProductsByNameStmt:        q.searchProductsByNameStmt,
-		searchProductsByNameInitialStmt: q.searchProductsByNameInitialStmt,
-		updateAdminPwStmt:               q.updateAdminPwStmt,
-		updateProductIfNotNilStmt:       q.updateProductIfNotNilStmt,
+		db:                           tx,
+		tx:                           tx,
+		createAdminStmt:              q.createAdminStmt,
+		createMenuStmt:               q.createMenuStmt,
+		deleteMenuStmt:               q.deleteMenuStmt,
+		getAdminStmt:                 q.getAdminStmt,
+		getMenuStmt:                  q.getMenuStmt,
+		listMenusStmt:                q.listMenusStmt,
+		searchMenusByNameStmt:        q.searchMenusByNameStmt,
+		searchMenusByNameInitialStmt: q.searchMenusByNameInitialStmt,
+		updateAdminPwStmt:            q.updateAdminPwStmt,
+		updateMenuIfNotNilStmt:       q.updateMenuIfNotNilStmt,
 	}
 }

@@ -7,23 +7,23 @@ SELECT * FROM admin WHERE id = ? LIMIT 1;
 -- name: UpdateAdminPw :exec
 UPDATE admin SET pw = ? WHERE id = ?;
 
--- name: CreateProduct :exec
-INSERT INTO product (category, price, cost, name, name_initial, description, barcode, expire, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+-- name: CreateMenu :exec
+INSERT INTO menu (category, price, cost, name, name_initial, description, barcode, expire, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 
--- name: GetProduct :one
-SELECT * FROM product WHERE seq = ? LIMIT 1;
+-- name: GetMenu :one
+SELECT * FROM menu WHERE seq = ? LIMIT 1;
 
--- name: ListProducts :many
-SELECT * FROM product WHERE seq >= ? LIMIT 10;
+-- name: ListMenus :many
+SELECT * FROM menu WHERE seq >= ? LIMIT 10;
 
--- name: SearchProductsByName :many
-SELECT * FROM product WHERE name LIKE ? LIMIT ?;
+-- name: SearchMenusByName :many
+SELECT * FROM menu WHERE name LIKE ? LIMIT ?;
 
--- name: SearchProductsByNameInitial :many
-SELECT * FROM product WHERE name_initial LIKE ? LIMIT ?;
+-- name: SearchMenusByNameInitial :many
+SELECT * FROM menu WHERE name_initial LIKE ? LIMIT ?;
 
--- name: UpdateProductIfNotNil :exec
-UPDATE product
+-- name: UpdateMenuIfNotNil :exec
+UPDATE menu
 SET category = COALESCE(sqlc.narg('category'), category),
     price = COALESCE(sqlc.narg('price'), price),
     cost = COALESCE(sqlc.narg('cost'), cost),
@@ -35,5 +35,5 @@ SET category = COALESCE(sqlc.narg('category'), category),
     size = COALESCE(sqlc.narg('size'), size)
 WHERE seq = ?;
 
--- name: DeleteProduct :exec
-DELETE FROM product WHERE seq = ?;
+-- name: DeleteMenu :exec
+DELETE FROM menu WHERE seq = ?;

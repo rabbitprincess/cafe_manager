@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gokch/cafe_manager/api/middleware"
 	"github.com/gokch/cafe_manager/service"
 	"github.com/gokch/cafe_manager/utilx"
 )
@@ -20,22 +19,22 @@ func GetMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		seq := c.Query("seq")
 		if seq == "" {
-			middleware.HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
+			HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
 			return
 		}
 		nSeq, ok := utilx.ParseInt64(seq)
 		if ok != true {
-			middleware.HandleError(c, http.StatusBadRequest, ErrSeqInvalidType)
+			HandleError(c, http.StatusBadRequest, ErrSeqInvalidType)
 			return
 		}
 
-		product, err := p.GetMenu(nSeq)
+		product, err := p.GetMenu(uint64(nSeq))
 		if err != nil {
-			middleware.HandleError(c, http.StatusInternalServerError, err)
+			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
 
-		middleware.HandleData(c, product)
+		HandleData(c, product)
 	}
 }
 
@@ -43,21 +42,21 @@ func ListMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		seq := c.Query("seq")
 		if seq == "" {
-			middleware.HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
+			HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
 			return
 		}
 		nSeq, ok := utilx.ParseInt64(seq)
 		if ok != true {
-			middleware.HandleError(c, http.StatusBadRequest, ErrSeqInvalidType)
+			HandleError(c, http.StatusBadRequest, ErrSeqInvalidType)
 			return
 		}
 
-		products, err := p.ListMenu(nSeq)
+		products, err := p.ListMenu(uint64(nSeq))
 		if err != nil {
-			middleware.HandleError(c, http.StatusInternalServerError, err)
+			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
-		middleware.HandleData(c, products)
+		HandleData(c, products)
 	}
 }
 
@@ -66,28 +65,35 @@ func SearchMenu(p *service.Menu) gin.HandlerFunc {
 		name := c.Query("name")
 		products, err := p.SearchMenu(name)
 		if err != nil {
-			middleware.HandleError(c, http.StatusInternalServerError, err)
+			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
-		middleware.HandleData(c, products)
+		HandleData(c, products)
 	}
+}
+
+var Menu struct {
+	Category    string `json:"category"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       int64  `json:"price"`
+	Cost        int64  `json:"cost"`
+	Expire      int64  `json:"expire"`
+	Size        string `json:"size"`
 }
 
 func AddMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		category := c.GetString("category")
-		name := c.GetString("name")
-		description := c.GetString("description")
-		price := c.GetInt64("price")
-		cost := c.GetInt64("cost")
-		expire := c.GetInt64("expire")
-		size := c.GetBool("size")
-
-		if err := p.AddMenu(category, name, description, price, cost, expire, size); err != nil {
-			middleware.HandleError(c, http.StatusInternalServerError, err)
+		if err := c.ShouldBind(&Menu); err != nil {
+			HandleError(c, http.StatusBadRequest, err)
 			return
 		}
-		middleware.HandleData(c, nil)
+
+		if err := p.AddMenu(Menu.Category, Menu.Name, Menu.Description, Menu.Price, Menu.Cost, Menu.Expire, Menu.Size); err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+		HandleData(c, nil)
 	}
 }
 
@@ -95,7 +101,7 @@ func UpdateMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var category, name, description *string
 		var price, cost, expire *int64
-		var size *bool
+		var size *string
 		if _, ok := c.Get("category"); ok {
 			categoryVal := c.GetString("category")
 			category = &categoryVal
@@ -121,14 +127,14 @@ func UpdateMenu(p *service.Menu) gin.HandlerFunc {
 			expire = &expireVal
 		}
 		if _, ok := c.Get("size"); ok {
-			sizeVal := c.GetBool("size")
+			sizeVal := c.GetString("size")
 			size = &sizeVal
 		}
 		if err := p.UpdateMenu(category, name, description, price, cost, expire, size); err != nil {
-			middleware.HandleError(c, http.StatusInternalServerError, err)
+			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
-		middleware.HandleData(c, nil)
+		HandleData(c, nil)
 	}
 }
 
@@ -136,18 +142,18 @@ func DeleteMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		seq, exist := c.Params.Get("seq")
 		if exist != true {
-			middleware.HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
+			HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
 			return
 		}
 		nSeq, ok := utilx.ParseInt64(seq)
 		if ok != true {
-			middleware.HandleError(c, http.StatusBadRequest, ErrSeqInvalidType)
+			HandleError(c, http.StatusBadRequest, ErrSeqInvalidType)
 			return
 		}
-		if err := p.DeleteMenu(nSeq); err != nil {
-			middleware.HandleError(c, http.StatusInternalServerError, err)
+		if err := p.DeleteMenu(uint64(nSeq)); err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
-		middleware.HandleData(c, nil)
+		HandleData(c, nil)
 	}
 }

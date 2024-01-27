@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/gokch/cafe_manager/api/middleware"
 	v1 "github.com/gokch/cafe_manager/api/v1"
 	"github.com/gokch/cafe_manager/service"
 )
@@ -12,12 +11,13 @@ func InitRouter(serv *service.Service, r *gin.Engine) {
 	r.Use(gin.Recovery())
 	// r.NoRoute()
 	// r.NoMethod()
-	jwt := middleware.NewJwtMiddleWare()
 
-	adminRouter := r.Group("/admin")
-	adminRouter.GET("/register", v1.Register(serv.Admin))
-	adminRouter.POST("/login", v1.Login(serv.Admin), jwt.LoginHandler)
-	adminRouter.POST("/logout", v1.Logout(serv.Admin), jwt.LogoutHandler)
+	authRouter := r.Group("/auth")
+	authRouter.GET("/register", v1.Register(serv.Admin))
+
+	jwt := v1.NewJWTMiddleware(serv.Admin)
+	authRouter.POST("/login", jwt.LoginHandler)
+	authRouter.POST("/logout", jwt.LogoutHandler)
 
 	menuRouter := r.Group("/menu")
 	menuRouter.Use(jwt.MiddlewareFunc()) // check auth

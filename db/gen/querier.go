@@ -10,15 +10,15 @@ import (
 
 type Querier interface {
 	CreateAdmin(ctx context.Context, arg CreateAdminParams) error
-	CreateProduct(ctx context.Context, arg CreateProductParams) error
-	DeleteProduct(ctx context.Context, seq int64) error
+	CreateMenu(ctx context.Context, arg CreateMenuParams) error
+	DeleteMenu(ctx context.Context, seq uint64) error
 	GetAdmin(ctx context.Context, id string) (*Admin, error)
-	GetProduct(ctx context.Context, seq int64) (*Product, error)
-	ListProducts(ctx context.Context, seq int64) ([]*Product, error)
-	SearchProductsByName(ctx context.Context, arg SearchProductsByNameParams) ([]*Product, error)
-	SearchProductsByNameInitial(ctx context.Context, arg SearchProductsByNameInitialParams) ([]*Product, error)
+	GetMenu(ctx context.Context, seq uint64) (*Menu, error)
+	ListMenus(ctx context.Context, seq uint64) ([]*Menu, error)
+	SearchMenusByName(ctx context.Context, arg SearchMenusByNameParams) ([]*Menu, error)
+	SearchMenusByNameInitial(ctx context.Context, arg SearchMenusByNameInitialParams) ([]*Menu, error)
 	UpdateAdminPw(ctx context.Context, arg UpdateAdminPwParams) error
-	UpdateProductIfNotNil(ctx context.Context, arg UpdateProductIfNotNilParams) error
+	UpdateMenuIfNotNil(ctx context.Context, arg UpdateMenuIfNotNilParams) error
 }
 
 var _ Querier = (*Queries)(nil)

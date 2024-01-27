@@ -32,24 +32,24 @@ func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) error 
 	return err
 }
 
-const createProduct = `-- name: CreateProduct :exec
-INSERT INTO product (category, price, cost, name, name_initial, description, barcode, expire, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+const createMenu = `-- name: CreateMenu :exec
+INSERT INTO menu (category, price, cost, name, name_initial, description, barcode, expire, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
-type CreateProductParams struct {
-	Category    sql.NullString `json:"category"`
-	Price       int32          `json:"price"`
-	Cost        int32          `json:"cost"`
-	Name        string         `json:"name"`
-	NameInitial string         `json:"name_initial"`
-	Description string         `json:"description"`
-	Barcode     []byte         `json:"barcode"`
-	Expire      time.Time      `json:"expire"`
-	Size        bool           `json:"size"`
+type CreateMenuParams struct {
+	Category    string    `json:"category"`
+	Price       int32     `json:"price"`
+	Cost        int32     `json:"cost"`
+	Name        string    `json:"name"`
+	NameInitial string    `json:"name_initial"`
+	Description string    `json:"description"`
+	Barcode     []byte    `json:"barcode"`
+	Expire      time.Time `json:"expire"`
+	Size        string    `json:"size"`
 }
 
-func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) error {
-	_, err := q.exec(ctx, q.createProductStmt, createProduct,
+func (q *Queries) CreateMenu(ctx context.Context, arg CreateMenuParams) error {
+	_, err := q.exec(ctx, q.createMenuStmt, createMenu,
 		arg.Category,
 		arg.Price,
 		arg.Cost,
@@ -63,12 +63,12 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) er
 	return err
 }
 
-const deleteProduct = `-- name: DeleteProduct :exec
-DELETE FROM product WHERE seq = ?
+const deleteMenu = `-- name: DeleteMenu :exec
+DELETE FROM menu WHERE seq = ?
 `
 
-func (q *Queries) DeleteProduct(ctx context.Context, seq int64) error {
-	_, err := q.exec(ctx, q.deleteProductStmt, deleteProduct, seq)
+func (q *Queries) DeleteMenu(ctx context.Context, seq uint64) error {
+	_, err := q.exec(ctx, q.deleteMenuStmt, deleteMenu, seq)
 	return err
 }
 
@@ -89,13 +89,13 @@ func (q *Queries) GetAdmin(ctx context.Context, id string) (*Admin, error) {
 	return &i, err
 }
 
-const getProduct = `-- name: GetProduct :one
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM product WHERE seq = ? LIMIT 1
+const getMenu = `-- name: GetMenu :one
+SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM menu WHERE seq = ? LIMIT 1
 `
 
-func (q *Queries) GetProduct(ctx context.Context, seq int64) (*Product, error) {
-	row := q.queryRow(ctx, q.getProductStmt, getProduct, seq)
-	var i Product
+func (q *Queries) GetMenu(ctx context.Context, seq uint64) (*Menu, error) {
+	row := q.queryRow(ctx, q.getMenuStmt, getMenu, seq)
+	var i Menu
 	err := row.Scan(
 		&i.Seq,
 		&i.Category,
@@ -111,19 +111,19 @@ func (q *Queries) GetProduct(ctx context.Context, seq int64) (*Product, error) {
 	return &i, err
 }
 
-const listProducts = `-- name: ListProducts :many
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM product WHERE seq >= ? LIMIT 10
+const listMenus = `-- name: ListMenus :many
+SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM menu WHERE seq >= ? LIMIT 10
 `
 
-func (q *Queries) ListProducts(ctx context.Context, seq int64) ([]*Product, error) {
-	rows, err := q.query(ctx, q.listProductsStmt, listProducts, seq)
+func (q *Queries) ListMenus(ctx context.Context, seq uint64) ([]*Menu, error) {
+	rows, err := q.query(ctx, q.listMenusStmt, listMenus, seq)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []*Product
+	var items []*Menu
 	for rows.Next() {
-		var i Product
+		var i Menu
 		if err := rows.Scan(
 			&i.Seq,
 			&i.Category,
@@ -149,24 +149,24 @@ func (q *Queries) ListProducts(ctx context.Context, seq int64) ([]*Product, erro
 	return items, nil
 }
 
-const searchProductsByName = `-- name: SearchProductsByName :many
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM product WHERE name LIKE ? LIMIT ?
+const searchMenusByName = `-- name: SearchMenusByName :many
+SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM menu WHERE name LIKE ? LIMIT ?
 `
 
-type SearchProductsByNameParams struct {
+type SearchMenusByNameParams struct {
 	Name  string `json:"name"`
 	Limit int32  `json:"limit"`
 }
 
-func (q *Queries) SearchProductsByName(ctx context.Context, arg SearchProductsByNameParams) ([]*Product, error) {
-	rows, err := q.query(ctx, q.searchProductsByNameStmt, searchProductsByName, arg.Name, arg.Limit)
+func (q *Queries) SearchMenusByName(ctx context.Context, arg SearchMenusByNameParams) ([]*Menu, error) {
+	rows, err := q.query(ctx, q.searchMenusByNameStmt, searchMenusByName, arg.Name, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []*Product
+	var items []*Menu
 	for rows.Next() {
-		var i Product
+		var i Menu
 		if err := rows.Scan(
 			&i.Seq,
 			&i.Category,
@@ -192,24 +192,24 @@ func (q *Queries) SearchProductsByName(ctx context.Context, arg SearchProductsBy
 	return items, nil
 }
 
-const searchProductsByNameInitial = `-- name: SearchProductsByNameInitial :many
-SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM product WHERE name_initial LIKE ? LIMIT ?
+const searchMenusByNameInitial = `-- name: SearchMenusByNameInitial :many
+SELECT seq, category, price, cost, name, name_initial, description, barcode, expire, size FROM menu WHERE name_initial LIKE ? LIMIT ?
 `
 
-type SearchProductsByNameInitialParams struct {
+type SearchMenusByNameInitialParams struct {
 	NameInitial string `json:"name_initial"`
 	Limit       int32  `json:"limit"`
 }
 
-func (q *Queries) SearchProductsByNameInitial(ctx context.Context, arg SearchProductsByNameInitialParams) ([]*Product, error) {
-	rows, err := q.query(ctx, q.searchProductsByNameInitialStmt, searchProductsByNameInitial, arg.NameInitial, arg.Limit)
+func (q *Queries) SearchMenusByNameInitial(ctx context.Context, arg SearchMenusByNameInitialParams) ([]*Menu, error) {
+	rows, err := q.query(ctx, q.searchMenusByNameInitialStmt, searchMenusByNameInitial, arg.NameInitial, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []*Product
+	var items []*Menu
 	for rows.Next() {
-		var i Product
+		var i Menu
 		if err := rows.Scan(
 			&i.Seq,
 			&i.Category,
@@ -249,8 +249,8 @@ func (q *Queries) UpdateAdminPw(ctx context.Context, arg UpdateAdminPwParams) er
 	return err
 }
 
-const updateProductIfNotNil = `-- name: UpdateProductIfNotNil :exec
-UPDATE product
+const updateMenuIfNotNil = `-- name: UpdateMenuIfNotNil :exec
+UPDATE menu
 SET category = COALESCE(?, category),
     price = COALESCE(?, price),
     cost = COALESCE(?, cost),
@@ -263,7 +263,7 @@ SET category = COALESCE(?, category),
 WHERE seq = ?
 `
 
-type UpdateProductIfNotNilParams struct {
+type UpdateMenuIfNotNilParams struct {
 	Category    sql.NullString `json:"category"`
 	Price       sql.NullInt32  `json:"price"`
 	Cost        sql.NullInt32  `json:"cost"`
@@ -272,12 +272,12 @@ type UpdateProductIfNotNilParams struct {
 	Decription  sql.NullString `json:"decription"`
 	Barcode     sql.NullString `json:"barcode"`
 	Expire      sql.NullTime   `json:"expire"`
-	Size        sql.NullBool   `json:"size"`
-	Seq         int64          `json:"seq"`
+	Size        sql.NullString `json:"size"`
+	Seq         uint64         `json:"seq"`
 }
 
-func (q *Queries) UpdateProductIfNotNil(ctx context.Context, arg UpdateProductIfNotNilParams) error {
-	_, err := q.exec(ctx, q.updateProductIfNotNilStmt, updateProductIfNotNil,
+func (q *Queries) UpdateMenuIfNotNil(ctx context.Context, arg UpdateMenuIfNotNilParams) error {
+	_, err := q.exec(ctx, q.updateMenuIfNotNilStmt, updateMenuIfNotNil,
 		arg.Category,
 		arg.Price,
 		arg.Cost,

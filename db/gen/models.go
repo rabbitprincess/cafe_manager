@@ -5,7 +5,6 @@
 package gen
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -17,15 +16,15 @@ type Admin struct {
 	Phone string `json:"phone"`
 }
 
-type Product struct {
-	Seq         int64          `json:"seq"`
-	Category    sql.NullString `json:"category"`
-	Price       int32          `json:"price"`
-	Cost        int32          `json:"cost"`
-	Name        string         `json:"name"`
-	NameInitial string         `json:"name_initial"`
-	Description string         `json:"description"`
-	Barcode     []byte         `json:"barcode"`
-	Expire      time.Time      `json:"expire"`
-	Size        bool           `json:"size"`
+type Menu struct {
+	Seq         uint64    `json:"seq"`
+	Category    string    `json:"category"`
+	Price       int32     `json:"price"`
+	Cost        int32     `json:"cost"`
+	Name        string    `json:"name"`
+	NameInitial string    `json:"name_initial"`
+	Description string    `json:"description"`
+	Barcode     []byte    `json:"barcode"`
+	Expire      time.Time `json:"expire"`
+	Size        string    `json:"size"`
 }
