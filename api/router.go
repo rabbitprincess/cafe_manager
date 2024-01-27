@@ -16,15 +16,15 @@ func InitRouter(serv *service.Service, r *gin.Engine) {
 
 	adminRouter := r.Group("/admin")
 	adminRouter.GET("/register", v1.Register(serv.Admin))
-	adminRouter.GET("/login", v1.Login(serv.Admin), jwt.LoginHandler)
-	adminRouter.GET("/logout", v1.Logout(serv.Admin), jwt.LogoutHandler)
+	adminRouter.POST("/login", v1.Login(serv.Admin), jwt.LoginHandler)
+	adminRouter.POST("/logout", v1.Logout(serv.Admin), jwt.LogoutHandler)
 
 	menuRouter := r.Group("/menu")
 	menuRouter.Use(jwt.MiddlewareFunc()) // check auth
 	menuRouter.GET("/get", v1.GetMenu(serv.Menu))
 	menuRouter.GET("/search", v1.SearchMenu(serv.Menu))
 	menuRouter.GET("/list", v1.ListMenu(serv.Menu))
-	menuRouter.GET("/add", v1.AddMenu(serv.Menu))
-	menuRouter.GET("/update", v1.UpdateMenu(serv.Menu))
-	menuRouter.GET("/delete", v1.DeleteMenu(serv.Menu))
+	menuRouter.POST("/add", v1.AddMenu(serv.Menu))
+	menuRouter.POST("/update", v1.UpdateMenu(serv.Menu))
+	menuRouter.POST("/delete", v1.DeleteMenu(serv.Menu))
 }
