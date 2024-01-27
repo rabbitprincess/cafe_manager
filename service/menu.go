@@ -38,12 +38,12 @@ func (m *Menu) SearchMenu(name string) ([]*gen.Menu, error) {
 	var err error
 	if utilx.IsHangulInitialsOnly(name) {
 		menus, err = m.db.Job().SearchMenusByNameInitial(context.Background(), gen.SearchMenusByNameInitialParams{
-			NameInitial: name,
+			NameInitial: "%" + name + "%",
 			Limit:       10,
 		})
 	} else {
 		menus, err = m.db.Job().SearchMenusByName(context.Background(), gen.SearchMenusByNameParams{
-			Name:  name,
+			Name:  "%" + name + "%",
 			Limit: 10,
 		})
 	}
@@ -79,7 +79,7 @@ func (m *Menu) AddMenu(category, name, description string, price, cost, expire i
 	})
 }
 
-func (m *Menu) UpdateMenu(category, name, description string, price, cost, expire int64, barcode, size string) error {
+func (m *Menu) UpdateMenu(category, name, description string, price, cost, expire int64, barcode, size string, seq uint64) error {
 
 	var categoryNull, nameNull, nameInitial, decriptionNull sql.NullString
 	if category != "" {
@@ -127,6 +127,7 @@ func (m *Menu) UpdateMenu(category, name, description string, price, cost, expir
 			Expire:      expireNull,
 			Barcode:     barcodeNull,
 			Size:        sizeNull,
+			Seq:         seq,
 		}); err != nil {
 			return err
 		}

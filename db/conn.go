@@ -19,7 +19,7 @@ var (
 
 func ConnectFuncMysql(addr, port, id, pw, dbName string) ConnectFunc {
 	return func() (string, string, string) {
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?multiStatements=true", id, pw, addr, port, dbName)
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?multiStatements=true&parseTime=true", id, pw, addr, port, dbName)
 		return "mysql", dsn, dbName
 	}
 }

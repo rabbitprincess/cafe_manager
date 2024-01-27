@@ -100,12 +100,23 @@ func AddMenu(p *service.Menu) gin.HandlerFunc {
 
 func UpdateMenu(p *service.Menu) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		seq := c.Query("seq")
+		if seq == "" {
+			HandleError(c, http.StatusBadRequest, ErrSeqNotExist)
+			return
+		}
+		nSeq, ok := utilx.ParseInt64(seq)
+		if ok != true {
+			HandleError(c, http.StatusBadRequest, ErrSeqInvalidType)
+			return
+		}
+
 		if err := c.ShouldBind(&Menu); err != nil {
 			HandleError(c, http.StatusBadRequest, err)
 			return
 		}
 
-		if err := p.UpdateMenu(Menu.Category, Menu.Name, Menu.Description, Menu.Price, Menu.Cost, Menu.Expire, Menu.Barcode, Menu.Size); err != nil {
+		if err := p.UpdateMenu(Menu.Category, Menu.Name, Menu.Description, Menu.Price, Menu.Cost, Menu.Expire, Menu.Barcode, Menu.Size, uint64(nSeq)); err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}

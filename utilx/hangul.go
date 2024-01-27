@@ -3,12 +3,7 @@ package utilx
 import "unicode"
 
 func IsHangulInitial(ch rune) bool {
-	const (
-		startRune = 0x3131 // 'ㄱ'
-		endRune   = 0x314E // 'ㅎ'
-	)
-
-	return startRune <= ch && ch <= endRune
+	return 'ㄱ' <= ch && ch <= 'ㅎ'
 }
 
 func IsHangulInitialsOnly(s string) bool {
@@ -39,7 +34,7 @@ func GetInitialFromHangul(s string) string {
 		if IsHangulInitial(ch) {
 			result += string((ch))
 		} else if IsHangul(ch) {
-			result += string(convertChosungToLetter(((ch - 0xAC00) / (28 * 21)) + 0x1100))
+			result += string(convertChosungToLetter(((ch - '가') / (28 * 21)) + 'ᄀ'))
 		}
 	}
 	return result
