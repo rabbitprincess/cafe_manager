@@ -21,7 +21,7 @@ var (
 func TestAdmin(t *testing.T) {
 	db, err := NewDB(1, ConnectFuncMysql("127.0.0.1", "3306", "root", "951753ck", "cafe"))
 	if err != nil {
-		t.Skip() // TODO : make db mockup server ( using docker testsuite )
+		t.Skip("TODO: make db mockup server using docker testsuitr")
 	}
 	defer db.Close()
 
@@ -40,6 +40,7 @@ func TestAdmin(t *testing.T) {
 	// get not exist admin
 	adminInfo, err = db.Job().GetAdmin(context.Background(), "admin2")
 	require.Equal(t, err, sql.ErrNoRows)
+	require.Nil(t, adminInfo)
 }
 
 func TestTx(t *testing.T) {
