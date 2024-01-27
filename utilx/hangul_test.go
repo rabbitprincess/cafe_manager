@@ -61,24 +61,22 @@ func TestIsHangulInitial(t *testing.T) {
 	}
 }
 
-func TestPhoneNumber(t *testing.T) {
+func TestGetInitialFromHangul(t *testing.T) {
 	for _, test := range []struct {
-		input         string
-		isPhoneNumber bool
+		input  string
+		expect string
 	}{
-		{"010-1234-5678", true},
-		{"010-123-4567", true},
-		{"010-1234-567", false},
-
-		{"011-1234-5678", true},
-		{"011-123-4567", true},
-
-		{"019-1234-5678", true},
-		{"019-123-4567", true},
-
-		{"015-1234-5678", false},
-		{"02-1234-5678", false},
+		{"ㄱㄴㄷ", "ㄱㄴㄷ"},
+		{"ㄲㄸㅃㅆㅉ", "ㄲㄸㅃㅆㅉ"},
+		{"김철수", "ㄱㅊㅅ"},
+		{"박영희", "ㅂㅇㅎ"},
+		{"홍길동", "ㅎㄱㄷ"},
+		{"안녕하세요세상", "ㅇㄴㅎㅅㅇㅅㅅ"},
+		{"가나다라마바사아자차카타파하", "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ"},
+		{"각난닫람맏밥삿앙잦찿캌탙팦핳", "ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ"},
+		{"까따빠싸짜", "ㄲㄸㅃㅆㅉ"},
 	} {
-		require.Equal(t, test.isPhoneNumber, IsPhoneNumber(test.input), test.input)
+		result := GetInitialFromHangul(test.input)
+		require.Equal(t, test.expect, result, test.input)
 	}
 }

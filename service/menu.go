@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/gokch/cafe_manager/db"
@@ -55,12 +56,18 @@ func (m *Menu) SearchMenu(name string) ([]*gen.Menu, error) {
 }
 
 func (m *Menu) AddMenu(category, name, description string, price, cost, expire int64, barcode, size string) error {
+	if !utilx.IsHangulOnly(name) {
+		return fmt.Errorf("name is must be hangul: %s", name)
+	}
+	nameInitial := utilx.GetInitialFromHangul(name)
+
 	return m.db.TxJobFunc(sql.LevelDefault, false, func(tx *db.Tx) error {
 		if err := tx.CreateMenu(context.Background(), gen.CreateMenuParams{
 			Category:    category,
 			Price:       int32(price),
 			Cost:        int32(cost),
 			Name:        name,
+			NameInitial: nameInitial,
 			Description: description,
 			Expire:      time.Unix(expire, 0),
 			Barcode:     barcode,
@@ -73,12 +80,17 @@ func (m *Menu) AddMenu(category, name, description string, price, cost, expire i
 }
 
 func (m *Menu) UpdateMenu(category, name, description string, price, cost, expire int64, barcode, size string) error {
-	var categoryNull, nameNull, decriptionNull sql.NullString
+
+	var categoryNull, nameNull, nameInitial, decriptionNull sql.NullString
 	if category != "" {
 		categoryNull = sql.NullString{String: category, Valid: true}
 	}
 	if name != "" {
 		nameNull = sql.NullString{String: name, Valid: true}
+		if !utilx.IsHangulOnly(name) {
+			return fmt.Errorf("name is must be hangul: %s", name)
+		}
+		nameInitial = sql.NullString{String: utilx.GetInitialFromHangul(name), Valid: true}
 	}
 	if description != "" {
 		decriptionNull = sql.NullString{String: description, Valid: true}
@@ -103,16 +115,18 @@ func (m *Menu) UpdateMenu(category, name, description string, price, cost, expir
 	if size != "" {
 		sizeNull = sql.NullString{String: size, Valid: true}
 	}
+
 	return m.db.TxJobFunc(sql.LevelDefault, false, func(tx *db.Tx) error {
 		if err := tx.UpdateMenuIfNotNil(context.Background(), gen.UpdateMenuIfNotNilParams{
-			Category:   categoryNull,
-			Price:      priceNull,
-			Cost:       costNull,
-			Name:       nameNull,
-			Decription: decriptionNull,
-			Expire:     expireNull,
-			Barcode:    barcodeNull,
-			Size:       sizeNull,
+			Category:    categoryNull,
+			Price:       priceNull,
+			Cost:        costNull,
+			Name:        nameNull,
+			NameInitial: nameInitial,
+			Decription:  decriptionNull,
+			Expire:      expireNull,
+			Barcode:     barcodeNull,
+			Size:        sizeNull,
 		}); err != nil {
 			return err
 		}

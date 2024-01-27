@@ -55,7 +55,7 @@ func NewJWTMiddleware(admin *service.Admin) *jwt.GinJWTMiddleware {
 			id := Login.ID
 			pw := Login.PW
 
-			if err := admin.Login(id, pw); err != nil {
+			if err := admin.CheckLogin(id, pw); err != nil {
 				HandleError(c, http.StatusUnauthorized, err)
 				return nil, jwt.ErrFailedAuthentication
 			}

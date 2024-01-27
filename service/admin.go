@@ -36,7 +36,7 @@ func (a *Admin) Register(id, name, pw, phone string) error {
 	})
 }
 
-func (a *Admin) Login(id, pw string) error {
+func (a *Admin) CheckLogin(id, pw string) error {
 	adminInfo, err := a.db.Job().GetAdmin(context.Background(), id)
 	if err == sql.ErrNoRows {
 		return fmt.Errorf("invalid id")
@@ -50,8 +50,4 @@ func (a *Admin) Login(id, pw string) error {
 		return fmt.Errorf("invalid password")
 	}
 	return nil
-}
-
-func (a *Admin) Logout() {
-
 }
